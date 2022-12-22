@@ -1,0 +1,34 @@
+{
+  "name": "api_finderr",
+  "version": "1.0.0",
+  "description": "Travel recommendations api",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Diem0n/api_finderr.git"
+  },
+  "type": "module",
+  "keywords": [
+    "Express",
+    "NodeJs",
+    "MongoDB"
+  ],
+  "author": "Talha",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Diem0n/api_finderr/issues"
+  },
+  "homepage": "https://github.com/Diem0n/api_finderr#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-generator": "^4.2.0",
+    "node-fetch": "^3.3.0",
+    "nodemon": "^2.0.20"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.3"
+  }
+}
