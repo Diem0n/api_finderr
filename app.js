@@ -1,4 +1,4 @@
-import express, { query } from 'express';
+import express from 'express';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 
@@ -20,11 +20,11 @@ app.get('/', (req, res) => {
 // get weather data
 app.post('/weather', (req, res) => {
     const city = req.body.city;
-    const geocoding = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${process.env.API_KEY}`;
+    const geocoding = `http://pro.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${process.env.API_KEY}`;
     let lat = 0;
     let lon = 0;
     const cnt = 15;
-    const weather = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${lat}&lon=${lon}&cnt=${cnt}&appid=${process.env.API_KEY}`;
+    const weather = `https://pro.openweathermap.org/data/2.5/forecast/daily?lat=${lat}&lon=${lon}&cnt=${cnt}&appid=${process.env.API_KEY}`;
     fetch(geocoding)
     .then(response => {
         if (!response.ok) {
@@ -48,7 +48,7 @@ app.post('/weather', (req, res) => {
       })
       .then(data => {
         res.send({
-          data: data
+          forecast : data['list']
         });
       })
       .catch(err => {
@@ -57,45 +57,45 @@ app.post('/weather', (req, res) => {
     
 });
 // get recommedation data
-// app.post('/recommendation', (req, res) => {
-//     const category = req.body.category;
-//     const url = 'https://travel-places.p.rapidapi.com/';
-//     const options = {
-//         method: 'POST',
-//         headers: {
-//           'content-type': 'application/json',
-//           'X-RapidAPI-Key': `${process.env.API_KEY}`,
-//           'X-RapidAPI-Host': 'travel-places.p.rapidapi.com'
-//         },
-//         body: 
-//         query :
-//         { getPlaces(categories:["NATURE"],lat:37,lng:-122,maxDistMeters:50000) { name,lat,lng,abstract,distance,categories } }
-//       };
+app.post('/recommendation', (req, res) => {
+    const category = req.body.category;
+    const url = 'https://travel-places.p.rapidapi.com/';
+    const query = `query{getPlaces(categories:["${category}"], includeGallery: true, limit: 10) 
+    { 
+       name , 
 
-//     fetch(url, options)
-//     .then(response => {
-//         if (!response.ok) {
-//           throw new Error('Recommendation API call failed');
-//         }
-//         return response.json();
-//       }
-//     )
-//     .then(data => {
-//         res.send({
-//           data: data
-//         });
-//       }
-//     )
-//     .catch(err => {
-//         res.status(500).send(err.message);
-//       }
-//     );
+     }}`;
+    const options = {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'X-RapidAPI-Key': `${process.env.API_RAPID_PLACES}`,
+          'X-RapidAPI-Host': 'travel-places.p.rapidapi.com'
+        },
+        body: 
+          JSON.stringify({query: query})
+      };
 
-// });
+    fetch(url, options)
+    .then(response => {
+        if (!response.ok) {
+          throw new Error('Recommendation API call failed');
+        }
+        return response.json();
+      }
+    )
+    .then(data => {
+        res.send({
+          data: data
+        });
+      }
+    )
+    .catch(err => {
+        res.status(500).send(err.message);
+      }
+    );
 
-
-
-
+});
 
 
 
