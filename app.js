@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { query } from 'express';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 
@@ -13,60 +13,88 @@ app.use(express.json());
 
 // default route
 app.get('/', (req, res) => {
-    express.static('public' , {index: 'index.html'});
-
+    res.send('index.html' , { root: "public" });
 });
 
 
 // get weather data
-app.post('/weather/:city', (req, res) => {
-    const city = req.params.city;
+app.post('/weather', (req, res) => {
+    const city = req.body.city;
     const geocoding = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${process.env.API_KEY}`;
-    const weather =  `https://api.openweathermap.org/data/2.5/weather?lat=44.34&lon=10.99&appid=${process.env.API_KEY}`;
     let lat = 0;
     let lon = 0;
+    const cnt = 15;
+    const weather = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${lat}&lon=${lon}&cnt=${cnt}&appid=${process.env.API_KEY}`;
     fetch(geocoding)
-        .then(response => {
-            return response.json();
+    .then(response => {
+        if (!response.ok) {
+          throw new Error('Geocoding API call failed');
         }
-        )
-        .then(data => {
-            lat = data[0].lat;
-            lon = data[0].lon;
-           
-            
+        return response.json();
+      })
+      .then(data => {
+        lat = data[0].lat;
+        lon = data[0].lon;
+      })
+      .catch(err => {
+        res.status(500).send(err.message);
+      });
+      fetch(weather)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Weather API call failed');
         }
-        )
-        .catch(err => {
-            res.send(err)
-        }
-        );
-    fetch(weather)
-        .then(response => {
-            return response.json();
-        }
-        )
-        .then(data => {
-            res.send({
-                temp: Math.round(  273.15 - data.main.temp),
-                feels_like: Math.round(  273.15 - data.main.feels_like),
-                temp_min: Math.round(  273.15 - data.main.temp_min),
-                temp_max: Math.round(  273.15 - data.main.temp_max),
-                pressure: data.main.pressure,
-                humidity: data.main.humidity,
-                weather: data.weather[0].main,
-                description: data.weather[0].description,
-            });
-        }
-        )
-        .catch(err => {
-            res.send('Shit went sideways');
-        }   
-        );
-
-    
+        return response.json();
+      })
+      .then(data => {
+        res.send({
+          data: data
+        });
+      })
+      .catch(err => {
+        res.status(500).send(err.message);
+      });
     
 });
+// get recommedation data
+// app.post('/recommendation', (req, res) => {
+//     const category = req.body.category;
+//     const url = 'https://travel-places.p.rapidapi.com/';
+//     const options = {
+//         method: 'POST',
+//         headers: {
+//           'content-type': 'application/json',
+//           'X-RapidAPI-Key': `${process.env.API_KEY}`,
+//           'X-RapidAPI-Host': 'travel-places.p.rapidapi.com'
+//         },
+//         body: 
+//         query :
+//         { getPlaces(categories:["NATURE"],lat:37,lng:-122,maxDistMeters:50000) { name,lat,lng,abstract,distance,categories } }
+//       };
+
+//     fetch(url, options)
+//     .then(response => {
+//         if (!response.ok) {
+//           throw new Error('Recommendation API call failed');
+//         }
+//         return response.json();
+//       }
+//     )
+//     .then(data => {
+//         res.send({
+//           data: data
+//         });
+//       }
+//     )
+//     .catch(err => {
+//         res.status(500).send(err.message);
+//       }
+//     );
+
+// });
+
+
+
 
 
 
