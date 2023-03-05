@@ -24,7 +24,7 @@ app.post('/weather', (req, res) => {
     let lat = 0;
     let lon = 0;
     const cnt = 15;
-    const weather = `https://pro.openweathermap.org/data/2.5/forecast/daily?lat=${lat}&lon=${lon}&cnt=${cnt}&appid=${process.env.API_KEY}`;
+    let weather = `https://pro.openweathermap.org/data/2.5/forecast/daily?lat=${lat}&lon=${lon}&cnt=${cnt}&appid=${process.env.API_KEY}`;
     fetch(geocoding)
     .then(response => {
         if (!response.ok) {
